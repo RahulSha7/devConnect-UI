@@ -10,6 +10,7 @@ const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
+  const [error, setError] = useState("");
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
@@ -27,6 +28,7 @@ const Login = () => {
       dispatch(addUser(res.data));
       return navigate("/");
     } catch (err) {
+      setError("Invalid email or password");
       console.error(err);
     }
   };
@@ -60,11 +62,15 @@ const Login = () => {
             {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
           </button>
         </label>
-
-        <div className="card-actions flex justify-center items-center my-4 rounded-lg">
+      <div>
+         <p className="text-red-500 size-20"> {error}</p>
+      </div>
+        <div className="card-actions  justify-center items-center -my-1 rounded-lg ">
+         
           <button className="btn btn-primary " onClick={handleLogin}>
             Login
           </button>
+            
         </div>
       </div>
     </div>
