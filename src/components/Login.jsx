@@ -1,76 +1,140 @@
+import { useState } from "react";
 import axios from "axios";
-import React, { useState } from "react";
-import { Eye, EyeOff } from "lucide-react";  
 import { useDispatch } from "react-redux";
 import { addUser } from "../utils/userSlice";
 import { useNavigate } from "react-router-dom";
 import { BASE_URL } from "../utils/constants";
+import { Eye, EyeOff } from "lucide-react";
 
 const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [showPassword, setShowPassword] = useState(false);
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
+  const [isLoginForm, setIsLoginForm] = useState(true);
   const [error, setError] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
+
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
-
   const handleLogin = async () => {
     try {
-   const res =    await axios.post(
-       BASE_URL+ "/login",
-        { email, 
-          password },
+      const res = await axios.post(
+        BASE_URL + "/login",
+        {
+          email,
+          password,
+        },
         { withCredentials: true }
-  
       );
-      
       dispatch(addUser(res.data));
       return navigate("/");
     } catch (err) {
       setError("Invalid email or password");
-      console.error(err);
     }
   };
+
+  const handleSignUp = async () => {
+    try {
+      const res = await axios.post(
+        BASE_URL + "/signup",
+        { firstName, lastName, email, password },
+        { withCredentials: true }
+      );
+      dispatch(addUser(res.data.data));
+      return navigate("/profile");
+    } catch (err) {
+      setError("Signup failed");
+    }
+  };
+
   return (
-    <div className="card card-border bg-base-300 w-96 justify-center shadow-xl my-12 mx-auto">
-      <div className="card-body">
-        <h2 className="card-title justify-center">Login</h2>
-        <label className="input py-2 my-4 rounded-lg">
-          <input
-            value={email}
-            type="text"
-            placeholder="Email"
-            onChange={(e) => setEmail(e.target.value)}
-          />
-        </label>
-        <label className="input rounded-lg ">
-        <input
-            type={showPassword ? "text" : "password"}
-            placeholder="Password"
-            value={password}
-            onChange={e => setPassword(e.target.value)}
-           
-            required
-          />
-          <button
-            type="button"
-            onClick={() => setShowPassword(!showPassword)}
-            className="btn btn-ghost btn-xs"
-            aria-label={showPassword ? "Hide password" : "Show password"}
+    <div className="flex justify-center my-10">
+      <div className="card bg-base-300 w-96 shadow-xl">
+        <div className="card-body">
+          <h2 className="card-title justify-center">
+            {isLoginForm ? "Login" : "Sign Up"}
+          </h2>
+          <div>
+            {!isLoginForm && (
+              <>
+                <label className="form-control w-full max-w-xs my-2">
+                  <div className="label">
+                    <span className="label-text">First Name</span>
+                  </div>
+                  <input
+                    type="text"
+                    value={firstName}
+                    className="input input-bordered w-full max-w-xs"
+                    onChange={(e) => setFirstName(e.target.value)}
+                  />
+                </label>
+                <label className="form-control w-full max-w-xs my-2">
+                  <div className="label">
+                    <span className="label-text">Last Name</span>
+                  </div>
+                  <input
+                    type="text"
+                    value={lastName}
+                    className="input input-bordered w-full max-w-xs"
+                    onChange={(e) => setLastName(e.target.value)}
+                  />
+                </label>
+              </>
+            )}
+            <label className="form-control w-full max-w-xs my-2">
+              <div className="label">
+                <span className="label-text">Email ID:</span>
+              </div>
+              <input
+                type="text"
+                value={email}
+                className="input input-bordered w-full max-w-xs"
+                onChange={(e) => setEmail(e.target.value)}
+              />
+            </label>
+
+            <label className="form-control w-full max-w-xs my-2 relative">
+              <div className="label">
+                <span className="label-text">Password</span>
+              </div>
+              <input
+                type={showPassword ? "text" : "password"}
+                value={password}
+                className="input input-bordered w-full max-w-xs pr-10"
+                onChange={(e) => setPassword(e.target.value)}
+              />
+              <button 
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                className="absolute right-3 top-7 btn btn-xs btn-ghost"
+                aria-label={showPassword ? "Hide password" : "Show password"}
+              >
+                {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+              </button>
+            </label>
+          </div>
+
+          <p className="text-red-500">{error}</p>
+
+          <div className="card-actions justify-center m-2">
+            <button
+              className="btn btn-primary"
+              onClick={isLoginForm ? handleLogin : handleSignUp}
+            >
+              {isLoginForm ? "Login" : "Sign Up"}
+            </button>
+          </div>
+
+          <p
+            className="m-auto cursor-pointer py-2"
+            onClick={() => setIsLoginForm((value) => !value)}
           >
-            {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
-          </button>
-        </label>
-      <div>
-         <p className="text-red-500 size-20"> {error}</p>
-      </div>
-        <div className="card-actions  justify-center items-center -my-1 rounded-lg ">
-         
-          <button className="btn btn-primary " onClick={handleLogin}>
-            Login
-          </button>
-            
+            {isLoginForm
+              ? "New User? Signup Here"
+              : "Existing User? Login Here"}
+          </p>
         </div>
       </div>
     </div>

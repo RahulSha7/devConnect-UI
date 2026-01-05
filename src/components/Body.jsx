@@ -1,36 +1,34 @@
-import React, { useEffect } from 'react'
-import NavBar from './NavBar'
-import { Outlet, useNavigate } from 'react-router-dom'
-import Footer from './Footer'
-import axios from 'axios'
-import { BASE_URL } from '../utils/constants'
-import { addUser } from '../utils/userSlice'
-import { useDispatch, useSelector } from 'react-redux'
+import { Outlet, useNavigate } from "react-router-dom";
+import NavBar from "./NavBar";
+import Footer from "./Footer";
+import axios from "axios";
+import { BASE_URL } from "../utils/constants";
+import { useDispatch, useSelector } from "react-redux";
+import { addUser } from "../utils/userSlice";
+import { useEffect } from "react";
 
 const Body = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const userData = useSelector((store) => store.user);
 
-  const fetchData = async () => {
+  const fetchUser = async () => {
+    if (userData) return;
     try {
-      if(userData) return ;
-      const response = await axios.get(BASE_URL + '/profile/view', {
+      const res = await axios.get(BASE_URL + "/profile/view", {
         withCredentials: true,
       });
-      dispatch(addUser(response.data));
+      dispatch(addUser(res.data));
     } catch (err) {
-     
-        navigate('/login');
-     
-      console.error("Error fetching data:", err);
+      if (err.status === 401) {
+        navigate("/login");
+      }
+      console.error(err);
     }
   };
 
   useEffect(() => {
-   
-      fetchData();
-    
+    fetchUser();
   }, []);
 
   return (
@@ -41,6 +39,4 @@ const Body = () => {
     </div>
   );
 };
-
-
-export default Body
+export default Body;
