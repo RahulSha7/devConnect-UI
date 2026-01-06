@@ -38,7 +38,7 @@ const Premium = () => {
       order_id: orderId,
       prefill: {
         name: notes.firstName + " " + notes.lastName,
-        email: notes.emailId,
+        email: notes.email,
         contact: "9999999999",
       },
       theme: {
